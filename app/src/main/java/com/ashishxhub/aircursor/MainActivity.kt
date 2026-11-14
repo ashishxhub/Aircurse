@@ -249,6 +249,10 @@ private fun AirCursorDashboard() {
                     HudTile("🎬", "Media Player", "Playback & volume", Modifier.weight(1f)) { selectedPage = "media" }
                     HudTile("📊", "Presentation", "Slide controls", Modifier.weight(1f)) { selectedPage = "presentation" }
                 }
+                Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                    HudTile("🌀", "Motion Air Mouse", "Move cursor by tilting phone", Modifier.weight(1f)) { selectedPage = "motion" }
+                    Spacer(Modifier.weight(1f))
+                }
                 Text("AIRCURSOR • FUTURISTIC REMOTE INTERFACE", color = Muted, fontSize = 10.sp,
                     letterSpacing = 1.1.sp, modifier = Modifier.align(Alignment.CenterHorizontally))
             } else {
@@ -257,6 +261,11 @@ private fun AirCursorDashboard() {
                     Text(selectedPage.uppercase(), color = Color.White, fontWeight = FontWeight.Bold, fontSize = 18.sp)
                 }
                 when (selectedPage) {
+                    "motion" -> HudCard(Modifier.fillMaxWidth()) {
+                        MotionControlPanel(connected = connected) { moveX, moveY ->
+                            sendEvent("/move", JSONObject().put("dx", moveX).put("dy", moveY).toString())
+                        }
+                    }
                     "mouse" -> {
                         HudCard(Modifier.fillMaxWidth()) {
                             Text("AIR TRACKPAD", color = Cyan, fontWeight = FontWeight.Bold)
