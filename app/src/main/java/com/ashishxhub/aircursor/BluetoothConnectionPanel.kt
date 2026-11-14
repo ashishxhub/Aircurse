@@ -72,6 +72,7 @@ fun BluetoothConnectionPanel(
     var message by remember { mutableStateOf("Pair your Windows PC in Android Bluetooth settings first.") }
     var loading by remember { mutableStateOf(false) }
     var connectedName by remember { mutableStateOf<String?>(null) }
+    var activeClient by remember { mutableStateOf<BluetoothSppClient?>(null) }
 
     fun hasConnectPermission(): Boolean =
         Build.VERSION.SDK_INT < Build.VERSION_CODES.S ||
@@ -127,6 +128,8 @@ fun BluetoothConnectionPanel(
             }
             if (connectedName != null) {
                 OutlinedButton(onClick = {
+                    activeClient?.close()
+                    activeClient = null
                     connectedName = null
                     message = "Bluetooth disconnected."
                 }) { Text("DISCONNECT") }
@@ -149,6 +152,7 @@ fun BluetoothConnectionPanel(
                         message = "Connecting to $deviceName…"
                         try {
                             val client = BluetoothSppClient.connect(device)
+                            activeClient = client
                             connectedName = deviceName
                             message = "Bluetooth connected to $deviceName."
                             onConnected(client, deviceName)
