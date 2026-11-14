@@ -5,6 +5,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectDragGestures
+import androidx.compose.foundation.gestures.detectTransformGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -62,7 +63,7 @@ fun AirCursorScreen() {
                     readTimeout = 4000
                     requestMethod = if (body == null) "GET" else "POST"
                     setRequestProperty("Content-Type", "application/json")
-                    if (path != "/health") setRequestProperty("Authorization", "Bearer ${pairingToken.trim()}")
+                    setRequestProperty("Authorization", "Bearer ${pairingToken.trim()}")
                     if (body != null) {
                         doOutput = true
                         outputStream.use { it.write(body.toByteArray(Charsets.UTF_8)) }
@@ -110,7 +111,7 @@ fun AirCursorScreen() {
             verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
             Text("AirCursor", fontSize = 30.sp, color = Color.White)
-            Text("Wireless trackpad + keyboard • v0.6", color = Color.LightGray)
+            Text("Wireless trackpad + keyboard + controls • v0.7", color = Color.LightGray)
 
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 OutlinedTextField(
@@ -145,7 +146,7 @@ fun AirCursorScreen() {
                 Button(enabled = !busy, onClick = {
                     busy = true
                     status = "Checking desktop server…"
-                    request("/health") { ok, message ->
+                    request("/pair", "{}") { ok, message ->
                         connected = ok
                         busy = false
                         status = if (ok) "Connected • Desktop server ready" else message
@@ -223,8 +224,50 @@ fun AirCursorScreen() {
                 ) { Text("Reset") }
             }
 
+
+            Text("Two-finger scroll", color = Color.White, fontSize = 17.sp)
+            Box(
+                Modifier.fillMaxWidth()
+                    .height(110.dp)
+                    .background(Color(0xFF26334A), RoundedCornerShape(18.dp))
+                    .pointerInput(connected, host, port) {
+                        detectTransformGestures { _, pan, _, _ ->
+                            if (kotlin.math.abs(pan.y) >= 8f) {
+                                val amount = (-pan.y / 35f).toInt().coerceIn(-10, 10)
+                                if (amount != 0) sendEvent("/scroll", JSONObject().put("amount", amount).toString())
+                            }
+                        }
+                    },
+                contentAlignment = Alignment.Center
+            ) {
+                Text("Use two fingers and move up/down", color = Color.White)
+            }
+
+            Text("Volume & media", color = Color.White, fontSize = 17.sp)
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                OutlinedButton(onClick = { sendEvent("/volume", """{"action":"down"}""") }, modifier = Modifier.weight(1f)) { Text("Vol −") }
+                OutlinedButton(onClick = { sendEvent("/volume", """{"action":"mute"}""") }, modifier = Modifier.weight(1f)) { Text("Mute") }
+                OutlinedButton(onClick = { sendEvent("/volume", """{"action":"up"}""") }, modifier = Modifier.weight(1f)) { Text("Vol +") }
+            }
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                OutlinedButton(onClick = { sendEvent("/media", """{"action":"previous"}""") }, modifier = Modifier.weight(1f)) { Text("⏮") }
+                OutlinedButton(onClick = { sendEvent("/media", """{"action":"play_pause"}""") }, modifier = Modifier.weight(1f)) { Text("▶ / ⏸") }
+                OutlinedButton(onClick = { sendEvent("/media", """{"action":"next"}""") }, modifier = Modifier.weight(1f)) { Text("⏭") }
+            }
+
+            Text("Presentation controls", color = Color.White, fontSize = 17.sp)
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                OutlinedButton(onClick = { sendEvent("/presentation", """{"action":"previous"}""") }, modifier = Modifier.weight(1f)) { Text("← Previous") }
+                OutlinedButton(onClick = { sendEvent("/presentation", """{"action":"next"}""") }, modifier = Modifier.weight(1f)) { Text("Next →") }
+            }
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                OutlinedButton(onClick = { sendEvent("/presentation", """{"action":"start"}""") }, modifier = Modifier.weight(1f)) { Text("Start") }
+                OutlinedButton(onClick = { sendEvent("/presentation", """{"action":"exit"}""") }, modifier = Modifier.weight(1f)) { Text("Exit") }
+                OutlinedButton(onClick = { sendEvent("/presentation", """{"action":"black"}""") }, modifier = Modifier.weight(1f)) { Text("Black") }
+            }
+
             Text(
-                "Server API: GET /health • POST /move, /click, /scroll, /type",
+                "Server API: POST /pair, /move, /click, /scroll, /type, /volume, /media, /presentation",
                 color = Color.Gray,
                 fontSize = 11.sp
             )
