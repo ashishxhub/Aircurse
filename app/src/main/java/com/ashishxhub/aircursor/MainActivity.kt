@@ -253,6 +253,10 @@ private fun AirCursorDashboard() {
                     HudTile("🌀", "Motion Air Mouse", "Move cursor by tilting phone", Modifier.weight(1f)) { selectedPage = "motion" }
                     Spacer(Modifier.weight(1f))
                 }
+                Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                    HudTile("📱", "Phone Remote", "Control another Android phone", Modifier.weight(1f)) { selectedPage = "phone" }
+                    Spacer(Modifier.weight(1f))
+                }
                 Text("AIRCURSOR • FUTURISTIC REMOTE INTERFACE", color = Muted, fontSize = 10.sp,
                     letterSpacing = 1.1.sp, modifier = Modifier.align(Alignment.CenterHorizontally))
             } else {
@@ -261,6 +265,9 @@ private fun AirCursorDashboard() {
                     Text(selectedPage.uppercase(), color = Color.White, fontWeight = FontWeight.Bold, fontSize = 18.sp)
                 }
                 when (selectedPage) {
+                    "phone" -> HudCard(Modifier.fillMaxWidth()) {
+                        PhoneRemoteControlPanel()
+                    }
                     "motion" -> HudCard(Modifier.fillMaxWidth()) {
                         MotionControlPanel(connected = connected) { moveX, moveY ->
                             sendEvent("/move", JSONObject().put("dx", moveX).put("dy", moveY).toString())
