@@ -284,8 +284,8 @@ private fun AirCursorDashboard() {
                                 .background(Color(0xFF26334A)).pointerInput(connected) {
                                     androidx.compose.foundation.gestures.detectTransformGestures { _, pan, _, _ ->
                                         if (kotlin.math.abs(pan.y) > 8f) {
-                                            val amount = (-pan.y / 35f).toInt().coerceIn(-10, 10)
-                                            if (amount != 0) sendEvent("/scroll", JSONObject().put("amount", amount).toString())
+                                           
+                                            val amount = (pan.y * -0.0286f).toInt().coerceIn(-10, 10) (amount != 0) sendEvent("/scroll", JSONObject().put("amount", amount).toString())
                                         }
                                     }
                                 }, contentAlignment = Alignment.Center) {
