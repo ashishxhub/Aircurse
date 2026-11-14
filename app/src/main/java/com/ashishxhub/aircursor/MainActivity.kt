@@ -6,6 +6,8 @@ import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
@@ -36,6 +38,7 @@ fun AirCursorScreen() {
     var host by remember { mutableStateOf("192.168.1.10") }
     var port by remember { mutableStateOf("8765") }
     var pairingToken by remember { mutableStateOf("") }
+    var keyboardText by remember { mutableStateOf("") }
     var status by remember { mutableStateOf("Not connected • Enter your desktop server address") }
     var connected by remember { mutableStateOf(false) }
     var x by remember { mutableFloatStateOf(0f) }
@@ -103,11 +106,11 @@ fun AirCursorScreen() {
         surface = Color(0xFF1B2030)
     )) {
         Column(
-            Modifier.fillMaxSize().background(Color(0xFF10131B)).padding(16.dp),
+            Modifier.fillMaxSize().background(Color(0xFF10131B)).verticalScroll(rememberScrollState()).padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
             Text("AirCursor", fontSize = 30.sp, color = Color.White)
-            Text("Wireless trackpad • v0.5 secure pairing", color = Color.LightGray)
+            Text("Wireless trackpad + keyboard • v0.6", color = Color.LightGray)
 
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 OutlinedTextField(
@@ -221,7 +224,7 @@ fun AirCursorScreen() {
             }
 
             Text(
-                "Server API: GET /health • POST /move, /click, /scroll",
+                "Server API: GET /health • POST /move, /click, /scroll, /type",
                 color = Color.Gray,
                 fontSize = 11.sp
             )
