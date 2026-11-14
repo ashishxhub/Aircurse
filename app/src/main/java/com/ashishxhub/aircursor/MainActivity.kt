@@ -214,6 +214,10 @@ private fun AirCursorDashboard() {
                     Spacer(Modifier.height(4.dp))
                     Text(status, color = Muted, fontSize = 12.sp)
                     Spacer(Modifier.height(10.dp))
+                    BluetoothConnectionPanel { client, deviceName ->
+                        status = "Bluetooth connected to $deviceName"
+                    }
+                    Spacer(Modifier.height(10.dp))
                     OutlinedTextField(host, { host = it; connected = false }, Modifier.fillMaxWidth(),
                         label = { Text("Desktop IP") }, singleLine = true)
                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
