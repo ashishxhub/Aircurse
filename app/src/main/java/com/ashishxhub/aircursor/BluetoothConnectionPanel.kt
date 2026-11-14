@@ -114,8 +114,8 @@ fun BluetoothConnectionPanel(
     }
 
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        Text("BLUETOOTH CLASSIC • WINDOWS", color = Cyan, style = MaterialTheme.typography.titleSmall)
-        Text(message, color = Muted, style = MaterialTheme.typography.bodySmall)
+        Text("BLUETOOTH CLASSIC • WINDOWS", color = MaterialTheme.colorScheme.primary, style = MaterialTheme.typography.titleSmall)
+        Text(message, color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodySmall)
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             OutlinedButton(onClick = {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && !hasConnectPermission()) {
