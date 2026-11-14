@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">AirCursor</string>
+    <string name="aircursor_accessibility_description">Allows AirCursor to perform taps, swipes and navigation actions on this phone only after you enable the service and start the Bluetooth receiver.</string>
+</resources>
