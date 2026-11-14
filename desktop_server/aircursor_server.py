@@ -43,9 +43,16 @@ class Handler(BaseHTTPRequestHandler):
             self.reply(401, "Pairing token is missing or incorrect")
             return
         try:
-            length = min(int(self.headers.get("Content-Length", "0")), 4096)
+            length = int(self.headers.get("Content-Length", "0"))
+            if length < 0 or length > 4096:
+                self.reply(413, "Request too large")
+                return
             data = json.loads(self.rfile.read(length) or b"{}")
-            if self.path == "/move":
+
+            if self.path == "/pair":
+                self.reply(200, "Pairing successful")
+                return
+            elif self.path == "/move":
                 dx = max(-500, min(500, float(data.get("dx", 0))))
                 dy = max(-500, min(500, float(data.get("dy", 0))))
                 pyautogui.moveRel(dx, dy, duration=0)
@@ -58,6 +65,33 @@ class Handler(BaseHTTPRequestHandler):
             elif self.path == "/scroll":
                 amount = max(-10, min(10, int(data.get("amount", 0))))
                 pyautogui.scroll(amount)
+            elif self.path == "/type":
+                value = data.get("text", "")
+                if not isinstance(value, str) or len(value) > 500 or any(ord(c) < 32 or ord(c) > 126 for c in value):
+                    self.reply(400, "Text must be printable ASCII and at most 500 characters")
+                    return
+                pyautogui.write(value, interval=0.01)
+            elif self.path == "/volume":
+                keys = {"up": "volumeup", "down": "volumedown", "mute": "volumemute"}
+                action = data.get("action")
+                if action not in keys:
+                    self.reply(400, "Invalid volume action")
+                    return
+                pyautogui.press(keys[action])
+            elif self.path == "/media":
+                keys = {"play_pause": "playpause", "next": "nexttrack", "previous": "prevtrack"}
+                action = data.get("action")
+                if action not in keys:
+                    self.reply(400, "Invalid media action")
+                    return
+                pyautogui.press(keys[action])
+            elif self.path == "/presentation":
+                keys = {"next": "right", "previous": "left", "start": "f5", "exit": "esc", "black": "b"}
+                action = data.get("action")
+                if action not in keys:
+                    self.reply(400, "Invalid presentation action")
+                    return
+                pyautogui.press(keys[action])
             else:
                 self.reply(404, "Not found")
                 return
