@@ -35,6 +35,7 @@ class MainActivity : ComponentActivity() {
 fun AirCursorScreen() {
     var host by remember { mutableStateOf("192.168.1.10") }
     var port by remember { mutableStateOf("8765") }
+    var pairingToken by remember { mutableStateOf("") }
     var status by remember { mutableStateOf("Not connected • Enter your desktop server address") }
     var connected by remember { mutableStateOf(false) }
     var x by remember { mutableFloatStateOf(0f) }
@@ -58,6 +59,7 @@ fun AirCursorScreen() {
                     readTimeout = 4000
                     requestMethod = if (body == null) "GET" else "POST"
                     setRequestProperty("Content-Type", "application/json")
+                    if (path != "/health") setRequestProperty("Authorization", "Bearer ${pairingToken.trim()}")
                     if (body != null) {
                         doOutput = true
                         outputStream.use { it.write(body.toByteArray(Charsets.UTF_8)) }
@@ -105,7 +107,7 @@ fun AirCursorScreen() {
             verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
             Text("AirCursor", fontSize = 30.sp, color = Color.White)
-            Text("Wireless trackpad • v0.4 stability update", color = Color.LightGray)
+            Text("Wireless trackpad • v0.5 secure pairing", color = Color.LightGray)
 
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 OutlinedTextField(
@@ -124,6 +126,14 @@ fun AirCursorScreen() {
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
                 )
             }
+
+            OutlinedTextField(
+                value = pairingToken,
+                onValueChange = { pairingToken = it; connected = false },
+                modifier = Modifier.fillMaxWidth(),
+                label = { Text("Pairing token") },
+                singleLine = true
+            )
 
             Row(
                 verticalAlignment = Alignment.CenterVertically,
